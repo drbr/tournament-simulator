@@ -1,4 +1,5 @@
 import { Circle, CirclePosition, toRgbString } from './Circle';
+import { generateArray } from './utils';
 
 export const RECTANGLE_COUNT = 10;
 
@@ -20,10 +21,9 @@ function getPositionTransform(rectangleIndex: number, circlePosition: CirclePosi
 export const ParticipantsView: React.FC<{
   circles: readonly Circle[];
 }> = ({ circles }) => {
-  const rectangles = Array(RECTANGLE_COUNT);
   return (
     <svg width="100%" height="160" viewBox={`0 0 ${RECTANGLE_COUNT * 100 - 10} 160`}>
-      {rectangles.map((_, rectIndex: number) => (
+      {generateArray(RECTANGLE_COUNT, (rectIndex: number) => (
         <g key={String(rectIndex)}>
           <rect
             x={rectIndex * 100}
@@ -41,37 +41,45 @@ export const ParticipantsView: React.FC<{
       The elements are positioned via their `transform` property. It's important that
       the keys refer to the participants' actual IDs, so they can animate properly. */}
       {circles.map((circle: Circle) => (
-        <g key={circle.id}>
-          {/* Circle */}
-          <circle
-            cx={0}
-            cy={0}
-            transform={getPositionTransform(circle.rectangleIndex, circle.position)}
-            r={25}
-            fill={toRgbString(circle.color)}
-            stroke="#333"
-            strokeWidth="1"
-          />
-
-          {/* Number text */}
-          <text
-            x={0}
-            y={0}
-            transform={getPositionTransform(circle.rectangleIndex, circle.position)}
-            textAnchor="middle"
-            dominantBaseline="middle"
-            fill="white"
-            fontSize="16"
-            fontWeight="bold"
-            style={{
-              textShadow: '1px 1px 1px rgba(0,0,0,0.5)',
-              pointerEvents: 'none',
-            }}>
-            {circle.number}
-          </text>
-        </g>
+        <ParticipantCircle key={circle.id} circle={circle} />
       ))}
-      )
     </svg>
+  );
+};
+
+const ParticipantCircle: React.FC<{ circle: Circle }> = ({ circle }) => {
+  return (
+    <g key={circle.id}>
+      {/* Circle */}
+      <circle
+        cx={0}
+        cy={0}
+        // transform={getPositionTransform(circle.rectangleIndex, circle.position)}
+        style={{ transform: getPositionTransform(circle.rectangleIndex, circle.position) }}
+        r={25}
+        fill={toRgbString(circle.color)}
+        stroke="#333"
+        strokeWidth="1"
+      />
+
+      {/* Number text */}
+      <text
+        x={0}
+        y={0}
+        // transform={getPositionTransform(circle.rectangleIndex, circle.position)}
+        textAnchor="middle"
+        dominantBaseline="middle"
+        fill="white"
+        fontSize="16"
+        fontWeight="bold"
+        style={{
+          textShadow: '1px 1px 1px rgba(0,0,0,0.5)',
+          pointerEvents: 'none',
+          transform: getPositionTransform(circle.rectangleIndex, circle.position),
+          backgroundColor: 'pink',
+        }}>
+        {circle.number}
+      </text>
+    </g>
   );
 };
