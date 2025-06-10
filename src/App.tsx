@@ -6,9 +6,18 @@ interface Circle {
   number: number;
 }
 
+type CirclePosition = 'top' | 'bottom';
+
 interface Rectangle {
   id: string;
-  circles: Circle[];
+  circles: Record<CirclePosition, Circle>;
+}
+
+function mapCircles<T>(
+  circles: Record<CirclePosition, Circle>,
+  fn: (circle: Circle, position: CirclePosition) => T
+): T[] {
+  return [fn(circles['top'], 'top'), fn(circles['bottom'], 'bottom')];
 }
 
 type RGBColor = {
@@ -41,9 +50,9 @@ function generateArray<T>(length: number, constructor: (i: number) => T): T[] {
   return Array.from({ length }, (_, i) => constructor(i));
 }
 
-function randomCircle(index: number): Circle {
+function randomCircle(globalIndex: number): Circle {
   return {
-    id: `circle-${index}`,
+    id: `circle-${globalIndex}`,
     number: Math.floor(Math.random() * 99) + 1,
   };
 }
@@ -51,22 +60,26 @@ function randomCircle(index: number): Circle {
 function randomRectangles(): Rectangle[] {
   return generateArray(10, (index) => ({
     id: `rectangle-${index}`,
-    circles: generateArray(2, randomCircle),
+    circles: {
+      top: randomCircle(index * 2),
+      bottom: randomCircle(index * 2 + 1),
+    },
   }));
 }
 
-function getInitialCircleY(circleIndex: number): number {
-  return 60 + circleIndex * 80;
+const CIRCLE_Y: Record<CirclePosition, number> = {
+  top: 40,
+  bottom: 120,
+};
+
+function getCircleX(rectangleIndex: number): number {
+  return 45 + rectangleIndex * 100;
 }
 
-// Calculate transform for swapped position
-function getSwapTransform(circleIndex: number, isSwapped: boolean): string {
-  if (isSwapped) {
-    // Move first circle down by 80px, second circle up by 80px
-    const translateY = circleIndex === 0 ? 80 : -80;
-    return `translate(0, ${translateY})`;
-  }
-  return 'translate(0, 0)';
+function getPositionTransform(rectangleIndex: number, circlePosition: CirclePosition): string {
+  const x = getCircleX(rectangleIndex);
+  const y = CIRCLE_Y[circlePosition];
+  return `translate(${x}, ${y})`;
 }
 
 function getAnimationValues(circleIndex: number, isSwapped: boolean): string {
@@ -80,7 +93,6 @@ function getAnimationValues(circleIndex: number, isSwapped: boolean): string {
 export const App: React.FC = () => {
   const [rectangleData, setRectangleData] = useState<Rectangle[]>([]);
   const [isSwapped, setIsSwapped] = useState<boolean>(false);
-  const [animationKey, setAnimationKey] = useState<number>(0);
 
   // Generate random numbers and colors for all rectangles and circles
   useEffect(() => {
@@ -89,8 +101,7 @@ export const App: React.FC = () => {
   }, []);
 
   const swapCircles = (): void => {
-    setIsSwapped(!isSwapped);
-    setAnimationKey((prev) => prev + 1); // Force re-render to trigger new animations
+    setIsSwapped((s) => !s);
   };
 
   const buttonStyle: React.CSSProperties = {
@@ -104,7 +115,12 @@ export const App: React.FC = () => {
   return (
     <div className="App">
       <h1>Tournament Simulator </h1>
-      <p className="body-text">This simulates a tournament in which </p>
+      <p className="body-text">
+        This simulates a tournament in which there are several 1v1 matchups. After each match, the
+        winner moves to the right and the loser to the left. Each player has a (1-99); the higher
+        the ranking, the more likely they are to win. The question is: after many matchups, will the
+        players be sorted in order of their ranking?
+      </p>
 
       <div>
         <button
@@ -117,84 +133,65 @@ export const App: React.FC = () => {
           Swap Circles
         </button>
       </div>
-      <ParticipantsView
-        rectangles={rectangleData}
-        isSwapped={isSwapped}
-        animationKey={animationKey}
-      />
+
+      <div style={{ padding: '2rem 0' }}>
+        <ParticipantsView rectangles={rectangleData} />
+      </div>
     </div>
   );
 };
 
 const ParticipantsView: React.FC<{
   rectangles: Rectangle[];
-  isSwapped: boolean;
-  animationKey: number;
-}> = ({ rectangles, isSwapped, animationKey }) => {
+}> = ({ rectangles }) => {
   return (
-    <div style={{ padding: '20px' }}>
-      <svg width="1000" height="200" viewBox="0 0 1000 200">
-        {rectangles.map((rectangle: Rectangle, rectIndex: number) => (
-          <g key={rectangle.id}>
-            {/* Rectangle border */}
-            <rect
-              x={rectIndex * 100}
-              y={20}
-              width={90}
-              height={160}
-              fill="none"
-              stroke="#333"
-              strokeWidth="2"
-              rx="5"
-            />
+    <svg width="100%" height="160" viewBox="0 0 1000 160">
+      {rectangles.map((rectangle: Rectangle, rectIndex: number) => (
+        <g key={rectangle.id}>
+          {/* Rectangle border */}
+          <rect
+            x={rectIndex * 100}
+            y={0}
+            width={90}
+            height={160}
+            fill="none"
+            stroke="#333"
+            strokeWidth="2"
+            rx="5"
+          />
 
-            {/* Two circles in vertical column */}
-            {rectangle.circles.map((circle: Circle, circleIndex: number) => (
-              <g
-                key={`${circle.id}-${animationKey}`}
-                transform={getSwapTransform(circleIndex, isSwapped)}>
-                {/* SVG Animation */}
-                <animateTransform
-                  attributeName="transform"
-                  type="translate"
-                  values={getAnimationValues(circleIndex, isSwapped)}
-                  dur="0.8s"
-                  fill="freeze"
-                  calcMode="spline"
-                  keySplines="0.4,0,0.2,1"
-                  keyTimes="0;1"
-                />
+          {/* Two circles in vertical column */}
+          {mapCircles(rectangle.circles, (circle: Circle, circlePosition: CirclePosition) => (
+            <g key={circle.id}>
+              {/* Circle */}
+              <circle
+                cx={getCircleX(rectIndex)}
+                cy={CIRCLE_Y[circlePosition]}
+                r={25}
+                fill={toRgbString(getCircleColor(circle.number))}
+                stroke="#333"
+                strokeWidth="1"
+              />
 
-                {/* Circle */}
-                <circle
-                  cx={rectIndex * 100 + 45}
-                  cy={getInitialCircleY(circleIndex)}
-                  r={25}
-                  fill={toRgbString(getCircleColor(circle.number))}
-                  stroke="#333"
-                  strokeWidth="1"
-                />
-
-                {/* Number text */}
-                <text
-                  x={rectIndex * 100 + 45}
-                  y={getInitialCircleY(circleIndex)}
-                  textAnchor="middle"
-                  dominantBaseline="middle"
-                  fill="white"
-                  fontSize="16"
-                  fontWeight="bold"
-                  style={{
-                    textShadow: '1px 1px 1px rgba(0,0,0,0.5)',
-                    pointerEvents: 'none',
-                  }}>
-                  {circle.number}
-                </text>
-              </g>
-            ))}
-          </g>
-        ))}
-      </svg>
-    </div>
+              {/* Number text */}
+              <text
+                x={getCircleX(rectIndex)}
+                y={CIRCLE_Y[circlePosition]}
+                textAnchor="middle"
+                dominantBaseline="middle"
+                fill="white"
+                fontSize="16"
+                fontWeight="bold"
+                style={{
+                  textShadow: '1px 1px 1px rgba(0,0,0,0.5)',
+                  pointerEvents: 'none',
+                }}>
+                {circle.number}
+              </text>
+            </g>
+          ))}
+        </g>
+      ))}
+    </svg>
   );
 };

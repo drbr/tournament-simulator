@@ -5,6 +5,8 @@ html {
 .App {
   text-align: center;
   background-color: #282c34;
+  padding: 0 2rem;
+  overflow: auto;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
