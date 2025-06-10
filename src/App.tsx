@@ -1,13 +1,33 @@
-import React, { useState, useReducer, useEffect } from 'react';
+import React, { useReducer } from 'react';
 import './App.css';
 import { ParticipantsView, RECTANGLE_COUNT } from './ParticipantsView';
-import { randomCircles } from './Circle';
+import { Circle, randomCircle } from './Circle';
+
+function initRandomCircles(numRectangles: number): readonly Circle[] {
+  const circles: Circle[] = [];
+  for (let rectIndex = 0; rectIndex < numRectangles; rectIndex++) {
+    circles.push(randomCircle(String(rectIndex * 2), rectIndex, 'top'));
+    circles.push(randomCircle(String(rectIndex * 2 + 1), rectIndex, 'bottom'));
+  }
+  return circles;
+}
+
+export function shuffleCircles(
+  prevCircles: readonly Circle[],
+  numRectangles: number
+): readonly Circle[] {
+  return prevCircles.map((circle) => ({
+    ...circle,
+    rectangleIndex: (circle.rectangleIndex + 1) % numRectangles,
+  }));
+}
+
+function circlesReducer(prevCircles: readonly Circle[], _: void): readonly Circle[] {
+  return shuffleCircles(prevCircles, RECTANGLE_COUNT);
+}
 
 export const App: React.FC = () => {
-  const [circles, incrementCircles] = useReducer(
-    () => randomCircles(RECTANGLE_COUNT),
-    randomCircles(RECTANGLE_COUNT)
-  );
+  const [circles, shuffleCircles] = useReducer(circlesReducer, initRandomCircles(RECTANGLE_COUNT));
 
   const buttonStyle: React.CSSProperties = {
     padding: '10px 20px',
@@ -29,7 +49,7 @@ export const App: React.FC = () => {
 
       <div>
         <button
-          onClick={incrementCircles}
+          onClick={shuffleCircles}
           style={{
             ...buttonStyle,
             backgroundColor: '#ff6b6b',

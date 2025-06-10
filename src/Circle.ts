@@ -1,4 +1,4 @@
-import { generateArray, randomNumberInRange } from './utils';
+import { randomNumberInRange } from './utils';
 
 export type CirclePosition = 'top' | 'bottom';
 
@@ -17,7 +17,7 @@ type RGBColor = {
   b: number;
 };
 
-function randomCircle(id: string, rectIndex: number, position: CirclePosition): Circle {
+export function randomCircle(id: string, rectIndex: number, position: CirclePosition): Circle {
   const value = randomNumberInRange(1, 99);
   return {
     id: `circle-${id}`,
@@ -26,15 +26,6 @@ function randomCircle(id: string, rectIndex: number, position: CirclePosition): 
     rectangleIndex: rectIndex,
     position: position,
   };
-}
-
-export function randomCircles(numRectangles: number): readonly Circle[] {
-  const circles: Circle[] = [];
-  for (let rectIndex = 0; rectIndex < numRectangles; rectIndex++) {
-    circles.push(randomCircle(String(rectIndex * 2), rectIndex, 'top'));
-    circles.push(randomCircle(String(rectIndex * 2 + 1), rectIndex, 'bottom'));
-  }
-  return circles;
 }
 
 /**
