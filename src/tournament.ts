@@ -14,15 +14,21 @@ export type MatchParticipant = {
 const DECISIVENESS = 100;
 
 export function matchWinner(a: Circle, b: Circle): Circle {
-  const aChance = a.ranking + DECISIVENESS;
-  const bChance = b.ranking + DECISIVENESS;
-
-  const randomNumber = randomNumberInRange(0, aChance + bChance);
-  if (randomNumber < aChance) {
+  if (a.ranking > b.ranking) {
     return a;
   } else {
     return b;
   }
+
+  // const aChance = a.ranking + DECISIVENESS;
+  // const bChance = b.ranking + DECISIVENESS;
+
+  // const randomNumber = randomNumberInRange(0, aChance + bChance);
+  // if (randomNumber < aChance) {
+  //   return a;
+  // } else {
+  //   return b;
+  // }
 }
 
 export function playTournament(

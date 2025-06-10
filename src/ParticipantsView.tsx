@@ -1,7 +1,7 @@
 import { Circle, CirclePosition, toRgbString } from './Circle';
 import { generateArray } from './utils';
 
-export const RECTANGLE_COUNT = 10;
+export const RECTANGLE_COUNT = 2;
 
 const CIRCLE_Y: Record<CirclePosition, number> = {
   top: 40,
@@ -10,7 +10,7 @@ const CIRCLE_Y: Record<CirclePosition, number> = {
 
 const animationStyles = `
   .animated-circle , .animated-text {
-    transition: transform 2s ease;
+    transition: transform 1s ease;
   }
 `;
 
