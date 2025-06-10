@@ -86,7 +86,7 @@ const ParticipantCircle: React.FC<{ circle: Circle }> = ({ circle }) => {
           textShadow: '1px 1px 1px rgba(0,0,0,0.5)',
           pointerEvents: 'none',
         }}>
-        {circle.number}
+        {circle.ranking}
       </text>
     </g>
   );

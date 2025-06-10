@@ -4,7 +4,7 @@ export type CirclePosition = 'top' | 'bottom';
 
 export type Circle = Readonly<{
   id: string;
-  number: number;
+  ranking: number;
   // Color is derived from number. But, precompute it for performance
   color: RGBColor;
   rectangleIndex: number;
@@ -21,7 +21,7 @@ export function randomCircle(id: string, rectIndex: number, position: CirclePosi
   const value = randomNumberInRange(1, 99);
   return {
     id: `circle-${id}`,
-    number: value,
+    ranking: value,
     color: getCircleColor(value),
     rectangleIndex: rectIndex,
     position: position,
