@@ -19,7 +19,3 @@ html {
 .body-text {
   font-size: 1rem;
 }
-
-circle, text {
-  transition: transform 2s ;
-}

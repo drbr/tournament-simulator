@@ -8,6 +8,12 @@ const CIRCLE_Y: Record<CirclePosition, number> = {
   bottom: 120,
 };
 
+const animationStyles = `
+  .animated-circle , .animated-text {
+    transition: transform 2s ease;
+  }
+`;
+
 function getCircleX(rectangleIndex: number): number {
   return 45 + rectangleIndex * 100;
 }
@@ -22,28 +28,31 @@ export const ParticipantsView: React.FC<{
   circles: readonly Circle[];
 }> = ({ circles }) => {
   return (
-    <svg width="100%" height="160" viewBox={`0 0 ${RECTANGLE_COUNT * 100 - 10} 160`}>
-      {generateArray(RECTANGLE_COUNT, (rectIndex: number) => (
-        <g key={String(rectIndex)}>
-          <rect
-            x={rectIndex * 100}
-            y={0}
-            width={90}
-            height={160}
-            fill="none"
-            stroke="#333"
-            strokeWidth="2"
-            rx="5"
-          />
-        </g>
-      ))}
-      {/* Each participant is a <g> containing a circle and its text.
-      The elements are positioned via their `transform` property. It's important that
-      the keys refer to the participants' actual IDs, so they can animate properly. */}
-      {circles.map((circle: Circle) => (
-        <ParticipantCircle key={circle.id} circle={circle} />
-      ))}
-    </svg>
+    <>
+      <style>{animationStyles}</style>
+      <svg width="100%" height="160" viewBox={`0 0 ${RECTANGLE_COUNT * 100 - 10} 160`}>
+        {generateArray(RECTANGLE_COUNT, (rectIndex: number) => (
+          <g key={String(rectIndex)}>
+            <rect
+              x={rectIndex * 100}
+              y={0}
+              width={90}
+              height={160}
+              fill="none"
+              stroke="#333"
+              strokeWidth="2"
+              rx="5"
+            />
+          </g>
+        ))}
+        {/* Each participant is a <g> containing a circle and its text.
+        The elements are positioned via their `transform` property. It's important that
+        the keys refer to the participants' actual IDs, so they can animate properly. */}
+        {circles.map((circle: Circle) => (
+          <ParticipantCircle key={circle.id} circle={circle} />
+        ))}
+      </svg>
+    </>
   );
 };
 
@@ -54,8 +63,8 @@ const ParticipantCircle: React.FC<{ circle: Circle }> = ({ circle }) => {
       <circle
         cx={0}
         cy={0}
-        // transform={getPositionTransform(circle.rectangleIndex, circle.position)}
-        style={{ transform: getPositionTransform(circle.rectangleIndex, circle.position) }}
+        transform={getPositionTransform(circle.rectangleIndex, circle.position)}
+        className="animated-circle"
         r={25}
         fill={toRgbString(circle.color)}
         stroke="#333"
@@ -66,7 +75,8 @@ const ParticipantCircle: React.FC<{ circle: Circle }> = ({ circle }) => {
       <text
         x={0}
         y={0}
-        // transform={getPositionTransform(circle.rectangleIndex, circle.position)}
+        transform={getPositionTransform(circle.rectangleIndex, circle.position)}
+        className="animated-text"
         textAnchor="middle"
         dominantBaseline="middle"
         fill="white"
@@ -75,8 +85,6 @@ const ParticipantCircle: React.FC<{ circle: Circle }> = ({ circle }) => {
         style={{
           textShadow: '1px 1px 1px rgba(0,0,0,0.5)',
           pointerEvents: 'none',
-          transform: getPositionTransform(circle.rectangleIndex, circle.position),
-          backgroundColor: 'pink',
         }}>
         {circle.number}
       </text>
