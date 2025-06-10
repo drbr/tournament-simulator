@@ -23,7 +23,7 @@ type RGBColor = {
 function getCircleColor(circleValue: number): RGBColor {
   const normalizedValue = (circleValue - 1) / 98; // Normalize to 0-1 range
 
-  const left: RGBColor = { r: 0, g: 100, b: 255 }; // blue
+  const left: RGBColor = { r: 40, g: 100, b: 255 }; // blue
   const right: RGBColor = { r: 255, g: 80, b: 0 }; // orange-red
 
   const r = Math.round(left.r + (right.r - left.r) * normalizedValue);
