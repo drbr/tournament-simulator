@@ -82,14 +82,6 @@ function getPositionTransform(rectangleIndex: number, circlePosition: CirclePosi
   return `translate(${x}, ${y})`;
 }
 
-function getAnimationValues(circleIndex: number, isSwapped: boolean): string {
-  if (isSwapped) {
-    return circleIndex === 0 ? '0,0;0,80' : '0,0;0,-80';
-  } else {
-    return circleIndex === 0 ? '0,80;0,0' : '0,-80;0,0';
-  }
-}
-
 export const App: React.FC = () => {
   const [rectangleData, setRectangleData] = useState<Rectangle[]>([]);
   const [isSwapped, setIsSwapped] = useState<boolean>(false);
@@ -165,8 +157,9 @@ const ParticipantsView: React.FC<{
             <g key={circle.id}>
               {/* Circle */}
               <circle
-                cx={getCircleX(rectIndex)}
-                cy={CIRCLE_Y[circlePosition]}
+                cx={0}
+                cy={0}
+                transform={getPositionTransform(rectIndex, circlePosition)}
                 r={25}
                 fill={toRgbString(getCircleColor(circle.number))}
                 stroke="#333"
@@ -175,8 +168,9 @@ const ParticipantsView: React.FC<{
 
               {/* Number text */}
               <text
-                x={getCircleX(rectIndex)}
-                y={CIRCLE_Y[circlePosition]}
+                x={0}
+                y={0}
+                transform={getPositionTransform(rectIndex, circlePosition)}
                 textAnchor="middle"
                 dominantBaseline="middle"
                 fill="white"
