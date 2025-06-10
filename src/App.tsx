@@ -1,29 +1,31 @@
 import React, { useState, useEffect } from 'react';
 import './App.css';
 
-function generateCircleData() {
-  return Array.from({ length: 10 }, (_, rectangleIndex) => ({
-    id: rectangleIndex,
-    circles: Array.from({ length: 2 }, (_, circleIndex) => {
-      const number = Math.floor(Math.random() * 99) + 1;
-      const normalizedValue = (number - 1) / 98; // Normalize to 0-1 range
-      const color = getGradientColor(normalizedValue);
-      return {
-        id: circleIndex,
-        number,
-        color,
-      };
-    }),
-  }));
+// Type definitions
+interface Circle {
+  id: number;
+  number: number;
+  color: string;
 }
+
+interface Rectangle {
+  id: number;
+  circles: Circle[];
+}
+
+type RGBColor = {
+  r: number;
+  g: number;
+  b: number;
+};
 
 /**
  * Calculates the gradient from blue (1) to orange (99)
  */
-function getGradientColor(normalizedValue) {
+function getGradientColor(normalizedValue: number): string {
   // Blue RGB: (0, 100, 255), Orange RGB: (255, 165, 0)
-  const blue = { r: 0, g: 100, b: 255 };
-  const orange = { r: 255, g: 165, b: 0 };
+  const blue: RGBColor = { r: 0, g: 100, b: 255 };
+  const orange: RGBColor = { r: 255, g: 165, b: 0 };
 
   const r = Math.round(blue.r + (orange.r - blue.r) * normalizedValue);
   const g = Math.round(blue.g + (orange.g - blue.g) * normalizedValue);
@@ -32,23 +34,14 @@ function getGradientColor(normalizedValue) {
   return `rgb(${r}, ${g}, ${b})`;
 }
 
-function App() {
-  const [rectangleData, setRectangleData] = useState([]);
-  const [isSwapped, setIsSwapped] = useState(false);
-  const [animationKey, setAnimationKey] = useState(0);
-
-  // Generate random numbers and colors for all rectangles and circles
-  useEffect(() => {
-    const data = generateNewNumbers();
-    setRectangleData(data);
-  }, []);
-
-  const generateNewNumbers = () => {
-    const data = Array.from({ length: 10 }, (_, rectangleIndex) => ({
+function generateCircleData(): Rectangle[] {
+  return Array.from(
+    { length: 10 },
+    (_, rectangleIndex): Rectangle => ({
       id: rectangleIndex,
-      circles: Array.from({ length: 2 }, (_, circleIndex) => {
+      circles: Array.from({ length: 2 }, (_, circleIndex): Circle => {
         const number = Math.floor(Math.random() * 99) + 1;
-        const normalizedValue = (number - 1) / 98;
+        const normalizedValue = (number - 1) / 98; // Normalize to 0-1 range
         const color = getGradientColor(normalizedValue);
         return {
           id: circleIndex,
@@ -56,28 +49,60 @@ function App() {
           color,
         };
       }),
-    }));
+    })
+  );
+}
+
+const App: React.FC = () => {
+  const [rectangleData, setRectangleData] = useState<Rectangle[]>([]);
+  const [isSwapped, setIsSwapped] = useState<boolean>(false);
+  const [animationKey, setAnimationKey] = useState<number>(0);
+
+  // Generate random numbers and colors for all rectangles and circles
+  useEffect(() => {
+    const data = generateCircleData();
+    setRectangleData(data);
+  }, []);
+
+  const generateNewNumbers = (): void => {
+    const data = generateCircleData();
     setRectangleData(data);
   };
 
-  const swapCircles = () => {
+  const swapCircles = (): void => {
     setIsSwapped(!isSwapped);
     setAnimationKey((prev) => prev + 1); // Force re-render to trigger new animations
   };
 
   // Calculate initial circle position (before transform)
-  const getInitialCircleY = (circleIndex) => {
+  const getInitialCircleY = (circleIndex: number): number => {
     return 60 + circleIndex * 80;
   };
 
   // Calculate transform for swapped position
-  const getSwapTransform = (circleIndex) => {
+  const getSwapTransform = (circleIndex: number): string => {
     if (isSwapped) {
       // Move first circle down by 80px, second circle up by 80px
       const translateY = circleIndex === 0 ? 80 : -80;
       return `translate(0, ${translateY})`;
     }
     return 'translate(0, 0)';
+  };
+
+  const getAnimationValues = (circleIndex: number): string => {
+    if (isSwapped) {
+      return circleIndex === 0 ? '0,0;0,80' : '0,0;0,-80';
+    } else {
+      return circleIndex === 0 ? '0,80;0,0' : '0,-80;0,0';
+    }
+  };
+
+  const buttonStyle: React.CSSProperties = {
+    padding: '10px 20px',
+    fontSize: '16px',
+    border: 'none',
+    borderRadius: '5px',
+    cursor: 'pointer',
   };
 
   return (
@@ -89,13 +114,9 @@ function App() {
           <button
             onClick={generateNewNumbers}
             style={{
+              ...buttonStyle,
               marginRight: '10px',
-              padding: '10px 20px',
-              fontSize: '16px',
               backgroundColor: '#61dafb',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
             }}>
             Generate New Numbers
           </button>
@@ -103,12 +124,8 @@ function App() {
           <button
             onClick={swapCircles}
             style={{
-              padding: '10px 20px',
-              fontSize: '16px',
+              ...buttonStyle,
               backgroundColor: '#ff6b6b',
-              border: 'none',
-              borderRadius: '5px',
-              cursor: 'pointer',
               color: 'white',
             }}>
             {isSwapped ? 'Restore Positions' : 'Swap Circles'}
@@ -117,7 +134,7 @@ function App() {
 
         <div style={{ padding: '20px' }}>
           <svg width="1000" height="200" viewBox="0 0 1000 200">
-            {rectangleData.map((rectangle, rectIndex) => (
+            {rectangleData.map((rectangle: Rectangle, rectIndex: number) => (
               <g key={rectangle.id}>
                 {/* Rectangle border */}
                 <rect
@@ -132,21 +149,13 @@ function App() {
                 />
 
                 {/* Two circles in vertical column */}
-                {rectangle.circles.map((circle, circleIndex) => (
+                {rectangle.circles.map((circle: Circle, circleIndex: number) => (
                   <g key={`${circle.id}-${animationKey}`} transform={getSwapTransform(circleIndex)}>
                     {/* SVG Animation */}
                     <animateTransform
                       attributeName="transform"
                       type="translate"
-                      values={
-                        isSwapped
-                          ? circleIndex === 0
-                            ? '0,0;0,80'
-                            : '0,0;0,-80'
-                          : circleIndex === 0
-                          ? '0,80;0,0'
-                          : '0,-80;0,0'
-                      }
+                      values={getAnimationValues(circleIndex)}
                       dur="0.8s"
                       fill="freeze"
                       calcMode="spline"
@@ -193,6 +202,6 @@ function App() {
       </header>
     </div>
   );
-}
+};
 
 export default App;
