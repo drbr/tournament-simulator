@@ -1,8 +1,6 @@
 import { Circle, CirclePosition, toRgbString } from './Circle';
 import { generateArray } from './utils';
 
-export const RECTANGLE_COUNT = 2;
-
 const CIRCLE_Y: Record<CirclePosition, number> = {
   top: 40,
   bottom: 120,
@@ -26,12 +24,13 @@ function getPositionTransform(rectangleIndex: number, circlePosition: CirclePosi
 
 export const ParticipantsView: React.FC<{
   circles: readonly Circle[];
-}> = ({ circles }) => {
+  rectangleCount: number;
+}> = ({ circles, rectangleCount }) => {
   return (
     <>
       <style>{animationStyles}</style>
-      <svg width="100%" height="160" viewBox={`0 0 ${RECTANGLE_COUNT * 100 - 10} 160`}>
-        {generateArray(RECTANGLE_COUNT, (rectIndex: number) => (
+      <svg width="100%" height="160" viewBox={`0 0 ${rectangleCount * 100 - 10} 160`}>
+        {generateArray(rectangleCount, (rectIndex: number) => (
           <g key={String(rectIndex)}>
             <rect
               x={rectIndex * 100}

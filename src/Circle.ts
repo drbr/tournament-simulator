@@ -28,6 +28,15 @@ export function randomCircle(id: string, rectIndex: number, position: CirclePosi
   };
 }
 
+export function initRandomCircles(numRectangles: number): readonly Circle[] {
+  const circles: Circle[] = [];
+  for (let rectIndex = 0; rectIndex < numRectangles; rectIndex++) {
+    circles.push(randomCircle(String(rectIndex * 2), rectIndex, 'top'));
+    circles.push(randomCircle(String(rectIndex * 2 + 1), rectIndex, 'bottom'));
+  }
+  return sortInPlace(circles);
+}
+
 /**
  * Calculates the gradient from blue (1) to orange (99) and returns as an RGB color
  */
