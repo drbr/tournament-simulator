@@ -33,7 +33,7 @@ export const ParticipantsView: React.FC<{
   return (
     <>
       <style>{animationStyles(animationTimeMilliseconds)}</style>
-      <svg width="100%" height="160" viewBox={`0 0 ${rectangleCount * 100 - 10} 160`}>
+      <svg width="100%" height="160" viewBox={`0 -10 ${rectangleCount * 100 - 10} 180`}>
         {generateArray(rectangleCount, (rectIndex: number) => (
           <g key={String(rectIndex)}>
             <rect
@@ -42,7 +42,7 @@ export const ParticipantsView: React.FC<{
               width={90}
               height={160}
               fill="none"
-              stroke="#333"
+              stroke="#555"
               strokeWidth="2"
               rx="5"
             />
