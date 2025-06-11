@@ -39,9 +39,9 @@ export const App: React.FC = () => {
       <h1>Tournament Simulator </h1>
       <p>
         This simulates a tournament in which there are several 1v1 matchups. After each match, the
-        winner moves to the right and the loser to the left. Each player has a (1-99); the higher
-        the ranking, the more likely they are to win. The question is: after many matchups, will the
-        players be sorted in order of their ranking?
+        winner moves to the right and the loser to the left. Each player has a ranking (1-99); the
+        higher the ranking, the more likely they are to win. The question is: after enough matchups,
+        will the players be sorted in order of their ranking?
       </p>
 
       <div>
