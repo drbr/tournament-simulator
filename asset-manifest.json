@@ -1,0 +1,13 @@
+{
+  "files": {
+    "main.css": "/tournament-simulator/static/css/main.1d2f2ba0.css",
+    "main.js": "/tournament-simulator/static/js/main.cf1f9d1f.js",
+    "index.html": "/tournament-simulator/index.html",
+    "main.1d2f2ba0.css.map": "/tournament-simulator/static/css/main.1d2f2ba0.css.map",
+    "main.cf1f9d1f.js.map": "/tournament-simulator/static/js/main.cf1f9d1f.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.1d2f2ba0.css",
+    "static/js/main.cf1f9d1f.js"
+  ]
+}
