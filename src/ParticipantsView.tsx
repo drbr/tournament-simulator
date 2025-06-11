@@ -6,11 +6,14 @@ const CIRCLE_Y: Record<CirclePosition, number> = {
   bottom: 120,
 };
 
-const animationStyles = `
+function animationStyles(animationTimeMilliseconds: number) {
+  const delaySecondsString = `${animationTimeMilliseconds / 1000}s`;
+  return `
   .animated-circle , .animated-text {
-    transition: transform 0.3s ease-in-out;
+    transition: transform ${delaySecondsString} ease-in-out;
   }
 `;
+}
 
 function getCircleX(rectangleIndex: number): number {
   return 45 + rectangleIndex * 100;
@@ -25,10 +28,11 @@ function getPositionTransform(rectangleIndex: number, circlePosition: CirclePosi
 export const ParticipantsView: React.FC<{
   circles: readonly Circle[];
   rectangleCount: number;
-}> = ({ circles, rectangleCount }) => {
+  animationTimeMilliseconds: number;
+}> = ({ circles, rectangleCount, animationTimeMilliseconds }) => {
   return (
     <>
-      <style>{animationStyles}</style>
+      <style>{animationStyles(animationTimeMilliseconds)}</style>
       <svg width="100%" height="160" viewBox={`0 0 ${rectangleCount * 100 - 10} 160`}>
         {generateArray(rectangleCount, (rectIndex: number) => (
           <g key={String(rectIndex)}>

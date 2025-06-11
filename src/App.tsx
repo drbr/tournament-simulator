@@ -1,10 +1,12 @@
-import React, { useReducer } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import './App.css';
 import { ParticipantsView } from './ParticipantsView';
 import { Circle, initRandomCircles } from './Circle';
 import { playMatch } from './tournament';
 
-export const RECTANGLE_COUNT = 10;
+const RECTANGLE_COUNT = 10;
+const ANIMATION_TIME_MILLISECONDS = 300;
+const AUTO_PLAY_INTERVAL = 350;
 
 type GameState = Readonly<{
   iterationCount: number;
@@ -24,10 +26,20 @@ function circlesReducer(prev: GameState, _: void): GameState {
 }
 
 export const App: React.FC = () => {
+  const [autoPlay, setAutoPlay] = useState(false);
   const [state, iterateGame] = useReducer(circlesReducer, initialState);
+
+  useEffect(() => {
+    if (autoPlay) {
+      iterateGame();
+      const interval = setInterval(iterateGame, AUTO_PLAY_INTERVAL);
+      return () => clearInterval(interval);
+    }
+  }, [autoPlay, iterateGame]);
 
   const buttonStyle: React.CSSProperties = {
     padding: '10px 20px',
+    minWidth: '8rem',
     fontSize: '16px',
     border: 'none',
     borderRadius: '5px',
@@ -44,21 +56,46 @@ export const App: React.FC = () => {
         will the players be sorted in order of their ranking?
       </p>
 
-      <div>
+      <div style={{ display: 'flex', gap: '2rem' }}>
         <button
           onClick={iterateGame}
           style={{
             ...buttonStyle,
             backgroundColor: '#ff6b6b',
             color: 'white',
+            display: autoPlay ? 'none' : 'initial',
           }}>
-          Move Circles
+          Play One Match
+        </button>
+        <button
+          onClick={() => setAutoPlay(true)}
+          style={{
+            ...buttonStyle,
+            backgroundColor: '#00A070',
+            color: 'white',
+            display: autoPlay ? 'none' : 'initial',
+          }}>
+          Auto Play
+        </button>
+        <button
+          onClick={() => setAutoPlay(false)}
+          style={{
+            ...buttonStyle,
+            backgroundColor: '#00A070',
+            color: 'white',
+            display: autoPlay ? 'initial' : 'none',
+          }}>
+          Stop
         </button>
       </div>
       <p>Iterations: {state.iterationCount}</p>
 
       <div style={{ padding: '1rem 0' }}>
-        <ParticipantsView circles={state.circles} rectangleCount={RECTANGLE_COUNT} />
+        <ParticipantsView
+          circles={state.circles}
+          rectangleCount={RECTANGLE_COUNT}
+          animationTimeMilliseconds={ANIMATION_TIME_MILLISECONDS}
+        />
       </div>
     </div>
   );
