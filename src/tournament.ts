@@ -7,15 +7,9 @@ export type MatchParticipant = {
   ranking: number; // from 1 to 99
 };
 
-/** The Decisiveness value controls how often a player with a higher ranking will win against
- * a player with a lower one. The higher this number is, the better chance a lower-ranked player
- * has against a higher-ranked player.
- */
-const DECISIVENESS = 50;
-
-function matchWinner(a: Circle, b: Circle): Circle {
-  const aChance = a.ranking + DECISIVENESS;
-  const bChance = b.ranking + DECISIVENESS;
+function matchWinner(a: Circle, b: Circle, fairness: number): Circle {
+  const aChance = a.ranking + fairness;
+  const bChance = b.ranking + fairness;
 
   const randomNumber = randomNumberInRange(0, aChance + bChance);
   if (randomNumber < aChance) {
@@ -32,7 +26,11 @@ function matchWinner(a: Circle, b: Circle): Circle {
  * @returns A list of circles. It's important that these are returned in the same order
  * as they started. The easy way to do this is just to sort them by ID.
  */
-export function playMatch(circles: readonly Circle[], numRectangles: number): readonly Circle[] {
+export function playMatch(
+  circles: readonly Circle[],
+  numRectangles: number,
+  fairness: number
+): readonly Circle[] {
   const next: Circle[] = [];
   // Group the participants into matches, denoted by their rectangle index. Then, play each match
   // and determine the winner. The winner goes to the next rectangle, always on the top; and the
@@ -45,7 +43,7 @@ export function playMatch(circles: readonly Circle[], numRectangles: number): re
     if (!a || !b) {
       throw new Error('The indexing logic is wrong!!!!');
     }
-    const winner = matchWinner(a, b);
+    const winner = matchWinner(a, b, fairness);
     const loser = winner === a ? b : a;
     next.push(newPositionForWinner(winner, numRectangles));
     next.push(newPositionForLoser(loser));

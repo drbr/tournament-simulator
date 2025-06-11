@@ -7,6 +7,7 @@ import { playMatch } from './tournament';
 const RECTANGLE_COUNT = 10;
 const ANIMATION_TIME_MILLISECONDS = 300;
 const AUTO_PLAY_INTERVAL = 350;
+const DEFAULT_FAIRNESS = 30;
 
 type GameState = Readonly<{
   iterationCount: number;
@@ -15,19 +16,23 @@ type GameState = Readonly<{
 
 const initialState: GameState = {
   iterationCount: 0,
+
   circles: initRandomCircles(RECTANGLE_COUNT),
 };
 
-function circlesReducer(prev: GameState, _: void): GameState {
-  return {
-    iterationCount: prev.iterationCount + 1,
-    circles: playMatch(prev.circles, RECTANGLE_COUNT),
+function makeCirclesReducer(fairness: number) {
+  return (prev: GameState, _: void): GameState => {
+    return {
+      iterationCount: prev.iterationCount + 1,
+      circles: playMatch(prev.circles, RECTANGLE_COUNT, fairness),
+    };
   };
 }
 
 export const App: React.FC = () => {
+  const [fairness, setFairness] = useState(DEFAULT_FAIRNESS);
   const [autoPlay, setAutoPlay] = useState(false);
-  const [state, iterateGame] = useReducer(circlesReducer, initialState);
+  const [state, iterateGame] = useReducer(makeCirclesReducer(fairness), initialState);
 
   useEffect(() => {
     if (autoPlay) {
@@ -56,6 +61,27 @@ export const App: React.FC = () => {
         will the players be sorted in order of their ranking?
       </p>
 
+      <label style={{ display: 'flex', gap: '1rem', marginTop: '1rem', fontSize: '1.2rem' }}>
+        Fairness:
+        <input
+          type="number"
+          value={fairness}
+          min={0}
+          max={200}
+          onChange={(e) => setFairness(Number(e.target.value))}
+        />
+      </label>
+      <p
+        style={{
+          fontSize: '0.8rem',
+          textAlign: 'left',
+          marginBottom: '2rem',
+        }}>
+        The fairness value controls how often a player with a higher ranking will win against a
+        player with a lower one. The higher this number is, the better chance a lower-ranked player
+        has against a higher-ranked player — as the fairness increases, the probability of winning a
+        match approaches 50% for both parties.
+      </p>
       <div style={{ display: 'flex', gap: '2rem' }}>
         <button
           onClick={iterateGame}

@@ -18,3 +18,7 @@ html {
 h1 {
   font-size: 3rem;
 }
+
+p {
+  max-width: 40rem;
+}
