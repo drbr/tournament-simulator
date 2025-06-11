@@ -10,7 +10,7 @@ const CIRCLE_Y: Record<CirclePosition, number> = {
 
 const animationStyles = `
   .animated-circle , .animated-text {
-    transition: transform 1s ease;
+    transition: transform 0.5s ease;
   }
 `;
 

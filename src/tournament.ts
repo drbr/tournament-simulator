@@ -1,4 +1,4 @@
-import { Circle } from './Circle';
+import { Circle, sortInPlace } from './Circle';
 import { randomNumberInRange } from './utils';
 import groupBy from 'lodash/groupBy';
 
@@ -13,7 +13,7 @@ export type MatchParticipant = {
  */
 const DECISIVENESS = 100;
 
-export function matchWinner(a: Circle, b: Circle): Circle {
+function matchWinner(a: Circle, b: Circle): Circle {
   if (a.ranking > b.ranking) {
     return a;
   } else {
@@ -31,10 +31,14 @@ export function matchWinner(a: Circle, b: Circle): Circle {
   // }
 }
 
-export function playTournament(
-  circles: readonly Circle[],
-  numRectangles: number
-): readonly Circle[] {
+/**
+ * Runs one match and returns the participant circles in their new locations after the match.
+ * @param circles
+ * @param numRectangles
+ * @returns A list of circles. It's important that these are returned in the same order
+ * as they started. The easy way to do this is just to sort them by ID.
+ */
+export function playMatch(circles: readonly Circle[], numRectangles: number): readonly Circle[] {
   const next: Circle[] = [];
   // Group the participants into matches, denoted by their rectangle index. Then, play each match
   // and determine the winner. The winner goes to the next rectangle, always on the top; and the
@@ -52,7 +56,7 @@ export function playTournament(
     next.push(newPositionForWinner(winner, numRectangles));
     next.push(newPositionForLoser(loser));
   }
-  return next;
+  return sortInPlace(next);
 }
 
 function newPositionForWinner(winner: Circle, numRectangles: number): Circle {

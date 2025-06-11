@@ -1,8 +1,8 @@
 import React, { useReducer } from 'react';
 import './App.css';
 import { ParticipantsView, RECTANGLE_COUNT } from './ParticipantsView';
-import { Circle, randomCircle } from './Circle';
-import { playTournament } from './tournament';
+import { Circle, randomCircle, sortInPlace } from './Circle';
+import { playMatch } from './tournament';
 
 export function initRandomCircles(numRectangles: number): readonly Circle[] {
   const circles: Circle[] = [];
@@ -10,11 +10,11 @@ export function initRandomCircles(numRectangles: number): readonly Circle[] {
     circles.push(randomCircle(String(rectIndex * 2), rectIndex, 'top'));
     circles.push(randomCircle(String(rectIndex * 2 + 1), rectIndex, 'bottom'));
   }
-  return circles;
+  return sortInPlace(circles);
 }
 
 function circlesReducer(prevCircles: readonly Circle[], _: void): readonly Circle[] {
-  return playTournament(prevCircles, RECTANGLE_COUNT);
+  return playMatch(prevCircles, RECTANGLE_COUNT);
 }
 
 export const App: React.FC = () => {

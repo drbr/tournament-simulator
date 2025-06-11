@@ -47,3 +47,7 @@ function getCircleColor(circleValue: number): RGBColor {
 export function toRgbString({ r, g, b }: RGBColor): string {
   return `rgb(${r}, ${g}, ${b})`;
 }
+
+export function sortInPlace(circles: Circle[]): readonly Circle[] {
+  return circles.sort((a, b) => a.id.localeCompare(b.id));
+}
