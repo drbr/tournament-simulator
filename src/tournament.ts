@@ -11,7 +11,7 @@ export type MatchParticipant = {
  * a player with a lower one. The higher this number is, the better chance a lower-ranked player
  * has against a higher-ranked player.
  */
-const DECISIVENESS = 100;
+const DECISIVENESS = 50;
 
 function matchWinner(a: Circle, b: Circle): Circle {
   const aChance = a.ranking + DECISIVENESS;

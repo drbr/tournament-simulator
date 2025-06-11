@@ -6,12 +6,25 @@ import { playMatch } from './tournament';
 
 export const RECTANGLE_COUNT = 10;
 
-function circlesReducer(prevCircles: readonly Circle[], _: void): readonly Circle[] {
-  return playMatch(prevCircles, RECTANGLE_COUNT);
+type GameState = Readonly<{
+  iterationCount: number;
+  circles: readonly Circle[];
+}>;
+
+const initialState: GameState = {
+  iterationCount: 0,
+  circles: initRandomCircles(RECTANGLE_COUNT),
+};
+
+function circlesReducer(prev: GameState, _: void): GameState {
+  return {
+    iterationCount: prev.iterationCount + 1,
+    circles: playMatch(prev.circles, RECTANGLE_COUNT),
+  };
 }
 
 export const App: React.FC = () => {
-  const [circles, shuffleCircles] = useReducer(circlesReducer, initRandomCircles(RECTANGLE_COUNT));
+  const [state, iterateGame] = useReducer(circlesReducer, initialState);
 
   const buttonStyle: React.CSSProperties = {
     padding: '10px 20px',
@@ -24,7 +37,7 @@ export const App: React.FC = () => {
   return (
     <div className="App">
       <h1>Tournament Simulator </h1>
-      <p className="body-text">
+      <p>
         This simulates a tournament in which there are several 1v1 matchups. After each match, the
         winner moves to the right and the loser to the left. Each player has a (1-99); the higher
         the ranking, the more likely they are to win. The question is: after many matchups, will the
@@ -33,7 +46,7 @@ export const App: React.FC = () => {
 
       <div>
         <button
-          onClick={shuffleCircles}
+          onClick={iterateGame}
           style={{
             ...buttonStyle,
             backgroundColor: '#ff6b6b',
@@ -42,9 +55,10 @@ export const App: React.FC = () => {
           Move Circles
         </button>
       </div>
+      <p>Iterations: {state.iterationCount}</p>
 
-      <div style={{ padding: '2rem 0' }}>
-        <ParticipantsView circles={circles} rectangleCount={RECTANGLE_COUNT} />
+      <div style={{ padding: '1rem 0' }}>
+        <ParticipantsView circles={state.circles} rectangleCount={RECTANGLE_COUNT} />
       </div>
     </div>
   );
